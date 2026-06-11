@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CaseLens KR | 판례 요약·선고 경향 데이터</title>
+  <meta name="description" content="공개 판결문을 사건별 20줄 이내로 요약하고, 사건유형·법조항·법원·법관별 공개 판결 통계를 확인하는 판례 데이터 사이트입니다." />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <!-- AdSense 승인 후 이 위치에 Google AdSense 코드를 넣으세요. -->
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <a class="brand" href="index.html" aria-label="CaseLens KR 홈">
+        <span class="brand-mark">CL</span>
+        <span>
+          <strong>CaseLens KR</strong>
+          <small>판례 요약 · 선고 경향 데이터</small>
+        </span>
+      </a>
+      <nav class="top-nav" aria-label="상단 메뉴">
+        <a href="#cases">사건 목록</a>
+        <a href="#stats">통계</a>
+        <a href="disclaimer.html">분석 한계</a>
+        <a href="about.html">소개</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">공개 판결문 기반 데이터베이스</p>
+          <h1>사건은 짧게, 경향은 데이터로 봅니다.</h1>
+          <p class="hero-copy">사건명·사건번호·법원·선고일·진행상황·쟁점·판단 이유를 20줄 이내로 정리하고, 사건유형·법조항·법원·법관별 공개 판결 분포를 자동 집계합니다.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#cases">사건 보기</a>
+            <a class="button ghost" href="templates/case-template.json" download>사건 JSON 템플릿</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="운영 원칙">
+          <h2>운영 원칙</h2>
+          <ul>
+            <li>공개 판결문과 공식 출처를 기준으로 정리합니다.</li>
+            <li>개별 사건 요약은 20줄 이내로 제한합니다.</li>
+            <li>법관·법원 관련 항목은 공개 판결 데이터의 분포만 제시합니다.</li>
+            <li>사건 배당, 증거관계, 양형자료 차이를 통제하지 못합니다.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="container notice-box" role="note">
+      <strong>주의:</strong> 이 사이트의 통계는 수록된 공개 판결문 데이터에 한정됩니다. 특정 법관·법원·당사자의 가치관이나 편향성을 단정하는 자료가 아니며, 법률 자문을 대체하지 않습니다.
+    </section>
+
+    <section id="stats" class="container section-block">
+      <div class="section-title-row">
+        <div>
+          <p class="eyebrow">Statistics</p>
+          <h2>자동 집계</h2>
+        </div>
+        <button id="refreshButton" class="button small ghost" type="button">데이터 새로고침</button>
+      </div>
+      <div id="summaryStats" class="summary-grid" aria-live="polite"></div>
+      <div class="chart-grid">
+        <article class="panel">
+          <h3>사건유형별 분포</h3>
+          <div id="categoryStats" class="bar-list"></div>
+        </article>
+        <article class="panel">
+          <h3>법조항별 분포</h3>
+          <div id="statuteStats" class="bar-list"></div>
+        </article>
+        <article class="panel">
+          <h3>선고결과 분포</h3>
+          <div id="resultStats" class="bar-list"></div>
+        </article>
+        <article class="panel">
+          <h3>법관별 공개 판결 분포</h3>
+          <div id="judgeStats" class="bar-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="cases" class="container section-block">
+      <div class="section-title-row">
+        <div>
+          <p class="eyebrow">Cases</p>
+          <h2>사건 목록</h2>
+        </div>
+        <p id="caseCount" class="muted"></p>
+      </div>
+
+      <div class="filters" aria-label="사건 필터">
+        <label>
+          <span>검색</span>
+          <input id="searchInput" type="search" placeholder="사건명, 사건번호, 쟁점, 태그 검색" />
+        </label>
+        <label>
+          <span>사건유형</span>
+          <select id="categoryFilter"><option value="">전체</option></select>
+        </label>
+        <label>
+          <span>법조항</span>
+          <select id="statuteFilter"><option value="">전체</option></select>
+        </label>
+        <label>
+          <span>진행상황</span>
+          <select id="statusFilter"><option value="">전체</option></select>
+        </label>
+        <label>
+          <span>정렬</span>
+          <select id="sortSelect">
+            <option value="date-desc">선고일 최신순</option>
+            <option value="date-asc">선고일 오래된순</option>
+            <option value="title-asc">사건명 가나다순</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="caseList" class="case-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <dialog id="caseDialog" class="case-dialog">
+    <div class="dialog-inner">
+      <button id="dialogClose" class="dialog-close" type="button" aria-label="닫기">×</button>
+      <div id="caseDialogContent"></div>
+    </div>
+  </dialog>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <p>© <span id="year"></span> CaseLens KR. 공개 판결 데이터 요약·분석 프로젝트.</p>
+      <nav aria-label="하단 메뉴">
+        <a href="about.html">소개</a>
+        <a href="disclaimer.html">분석 한계</a>
+        <a href="privacy.html">개인정보처리방침</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/app.js" type="module"></script>
+</body>
+</html>
